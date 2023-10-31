@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import useForm from '../../hooks/form';
 import { SettingsContext } from '../../Context/Settings';
-
 import { v4 as uuid } from 'uuid';
 
 const Todo = () => {
+  const settings = useState(SettingsContext);
+
   const [defaultValues] = useState({
     difficulty: 4,
   });
   const [list, setList] = useState([]);
-  const state = useState(SettingsContext);
-  // const [incomplete, setIncomplete] = useState([]);
+  const [incomplete, setIncomplete] = useState([]);
   const { handleChange, handleSubmit } = useForm(addItem, defaultValues);
 
   function addItem(item) {
@@ -39,7 +39,7 @@ const Todo = () => {
   useEffect(() => {
     let incompleteCount = list.filter((item) => !item.complete).length;
     setIncomplete(incompleteCount);
-    document.title = `To Do List: ${state}`;
+    document.title = `To Do List: ${incomplete}`;
     // linter will want 'incomplete' added to dependency array unnecessarily.
     // disable code used to avoid linter warning
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,9 +47,9 @@ const Todo = () => {
 
   return (
     <>
-      {/* <header data-testid="todo-header">
+      <header data-testid="todo-header">
         <h1 data-testid="todo-h1">To Do List: {incomplete} items pending</h1>
-      </header> */}
+      </header>
 
       <form onSubmit={handleSubmit}>
         <h2>Add To Do Item</h2>
