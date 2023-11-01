@@ -21,4 +21,24 @@ describe('Testing Settings Context', () => {
     expect(screen.getByText('false')).toBeVisible();
     expect(screen.getByText('difficulty')).toBeVisible();
   });
+  test('Should be able to update hideComplete and displayItems.', () => {
+    render(
+      <SettingsProvider>
+        <SettingsContext.Consumer>
+          {(settings) => {
+            <div>
+              <p>{`${settings.hideCompleted}`}</p>
+              <p>{settings.displayItems}</p>
+              <button onClick={settings.toggleComplete}>toggle</button>
+              <button onClick={() => settings.changeDisplayItems(6)}>
+                displayItems
+              </button>
+            </div>;
+          }}
+        </SettingsContext.Consumer>
+      </SettingsProvider>
+    );
+    expect(screen.getByText(6)).toBeVisible();
+    expect(screen.getByText('true')).toBeVisible();
+  });
 });
