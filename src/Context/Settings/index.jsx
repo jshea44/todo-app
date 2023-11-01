@@ -26,7 +26,7 @@ function SettingsProvider(props) {
 
   // loads
   useEffect(() => {
-    let settings = localStorage.getItem('settings');
+    let settings = JSON.parse(localStorage.getItem('settings'));
     if (settings) {
       setDisplayItems(settings.displayItems);
       setHideCompleted(settings.hideCompleted);

@@ -1,6 +1,6 @@
 import SettingsProvider from './index.jsx';
 import { SettingsContext } from './index.jsx';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 describe('Testing Settings Context', () => {
   test('Should give displayItems, hideCompleted, and sort to children', () => {
@@ -38,7 +38,11 @@ describe('Testing Settings Context', () => {
         </SettingsContext.Consumer>
       </SettingsProvider>
     );
-    expect(screen.getByText(6)).toBeVisible();
+
+    fireEvent.click(screen.getByText('toggle'));
+    fireEvent.click(screen.getByText('displayItems'));
+
+    expect(screen.getByText('6')).toBeVisible();
     expect(screen.getByText('true')).toBeVisible();
   });
 });
