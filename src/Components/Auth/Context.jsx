@@ -31,70 +31,65 @@ const testUsers = {
 
 export const LoginContext = React.createContext();
 
-class LoginProvider extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      loggedIn: false,
-      can: this.can,
-      login: this.login,
-      logout: this.logout,
-      user: { capabilities: [] },
-      error: null,
-    };
-  }
+function LoginProvider(props) {
+  let [loggedIn, setLoggedIn] = React.useState(false);
+  let [user, setUser] = React.useState({ capabilities: [] });
+  let [token, setToken] = React.useState(null);
+  let [error, setError] = React.useState(null);
 
-  can = (capability) => {
-    return this?.state?.user?.capabilities?.includes(capability);
+  const can = (capability) => {
+    return user?.capabilities?.includes(capability);
   };
 
-  login = async (username, password) => {
-    let { loggedIn, token, user } = this.state;
+  const login = async (username, password) => {
     let auth = testUsers[username];
 
     if (auth && auth.password === password) {
       try {
-        this.validateToken(auth.token);
+        validateToken(auth.token);
       } catch (e) {
-        this.setLoginState(loggedIn, token, user, e);
+        setLoginState(loggedIn, token, user, e);
         console.error(e);
       }
     }
   };
 
-  logout = () => {
-    this.setLoginState(false, null, {});
+  const logout = () => {
+    setLoginState(false, null, { capabilities: [] });
   };
 
-  validateToken = (token) => {
+  const validateToken = (token) => {
     try {
-      let validUser = jwt_decode(token);
-      this.setLoginState(true, token, validUser);
+      let validUser = jwtDecode(token);
+      setLoginState(true, token, validUser);
     } catch (e) {
-      this.setLoginState(false, null, {}, e);
+      setLoginState(false, null, { capabilities: [] }, e);
       console.log('Token Validation Error', e);
     }
   };
 
-  setLoginState = (loggedIn, token, user, error) => {
-    cookie.save('auth', token);
-    this.setState({ token, loggedIn, user, error: error || null });
-  };
-
-  componentDidMount() {
+  React.useEffect(() => {
     const qs = new URLSearchParams(window.location.search);
     const cookieToken = cookie.load('auth');
     const token = qs.get('token') || cookieToken || null;
-    this.validateToken(token);
-  }
+    validateToken(token);
+  }, []);
 
-  render() {
-    return (
-      <LoginContext.Provider value={this.state}>
-        {this.props.children}
-      </LoginContext.Provider>
-    );
-  }
+  const setLoginState = (loggedIn, token, user, error) => {
+    cookie.save('auth', token);
+    setToken(token);
+    setLoggedIn(loggedIn);
+    setUser(user);
+    setError(error || null);
+  };
+
+  return (
+    <LoginContext.Provider
+      value={{ loggedIn, user, can, login, logout, error }}
+    >
+      {props.children}
+    </LoginContext.Provider>
+  );
 }
 
 export default LoginProvider;
